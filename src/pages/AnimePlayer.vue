@@ -1,13 +1,12 @@
 <template>
-  <!-- <Header /> -->
-  <div class="container">
+  <div class="anime-player">
+    <!-- Tombol Kembali -->
     <div class="back">
-      <a href="/samehadaku">
-        <i class="bi bi-arrow-left"></i>
-      </a>
+      <a href="/samehadaku"> <i class="bi bi-arrow-left"></i> Kembali </a>
     </div>
 
-    <div class="video-wrapper">
+    <!-- Video Player -->
+    <div class="video-container">
       <iframe
         v-if="selectedServerUrl"
         :src="selectedServerUrl"
@@ -16,15 +15,13 @@
         sandbox="allow-same-origin allow-scripts allow-popups"
         class="video-player"
       ></iframe>
-      <div v-else class="alert alert-warning mt-3">
-        Pilih server untuk memutar video.
-      </div>
+      <div v-else class="alert">Pilih server untuk memutar video.</div>
     </div>
 
-    <!-- Dropdown untuk memilih server -->
-    <div v-if="filteredQualities.length > 0" class="mt-3">
-      <label for="server-select" class="form-label">Pilih Server:</label>
-      <select id="server-select" class="form-select" v-model="selectedServer">
+    <!-- Pilih Server -->
+    <div v-if="filteredQualities.length > 0" class="server-select">
+      <label for="server-select">Pilih Server:</label>
+      <select id="server-select" v-model="selectedServer">
         <option disabled value="">Pilih Kualitas & Server</option>
         <optgroup
           v-for="(quality, index) in filteredQualities"
@@ -42,11 +39,12 @@
       </select>
     </div>
 
-    <div v-else class="alert alert-warning mt-3">
-      Tidak ada server yang tersedia.
-    </div>
+    <div v-else class="alert">Tidak ada server yang tersedia.</div>
 
+    <!-- Judul Anime -->
     <h1 class="title">{{ animeData.title }}</h1>
+
+    <!-- Navigasi Episode -->
     <div class="navigation">
       <button
         v-if="animeData.hasPrevEpisode"
@@ -68,29 +66,23 @@
 
 <script>
 import axios from "axios";
-//   import Header from "../components/HeaderSamehadaku.vue";
 
 export default {
   name: "AnimePlayer",
-  components: {
-    //   Header,
-  },
   data() {
     return {
       animeData: {},
-      serverData: { qualities: [] }, // Menyimpan daftar server
-      selectedServer: "", // Server yang dipilih oleh user
-      selectedServerUrl: "", // URL server yang dipilih
+      serverData: { qualities: [] },
+      selectedServer: "",
+      selectedServerUrl: "",
     };
   },
   computed: {
-    // Hanya menampilkan kualitas yang memiliki server
     filteredQualities() {
       return this.serverData.qualities.filter((q) => q.serverList.length > 0);
     },
   },
   watch: {
-    // Ketika server dipilih, update URL video
     selectedServer(newHref) {
       if (newHref) {
         this.fetchServerUrl(newHref);
@@ -100,24 +92,17 @@ export default {
   async created() {
     try {
       const episodeId = this.$route.params.episodeId;
-      console.log("Episode ID:", episodeId);
-
       if (!episodeId) throw new Error("Episode ID tidak ditemukan!");
 
-      // Fetch episode data
       const response = await axios.get(
         `https://wajik-anime-api.vercel.app/samehadaku/episode/${episodeId}`
       );
-      console.log("Episode Data:", response.data);
 
       if (!response.data.data) throw new Error("Episode data tidak ditemukan!");
 
       this.animeData = response.data.data;
       this.serverData = this.animeData.server || { qualities: [] };
 
-      console.log("Server Data:", this.serverData);
-
-      // Ambil server pertama yang tersedia (jika ada)
       let fallbackServer = null;
       for (const quality of this.serverData.qualities) {
         if (quality.serverList.length > 0) {
@@ -127,7 +112,7 @@ export default {
       }
 
       if (fallbackServer) {
-        this.selectedServer = fallbackServer.href; // Set server pertama sebagai default
+        this.selectedServer = fallbackServer.href;
         this.fetchServerUrl(fallbackServer.href);
       }
     } catch (error) {
@@ -138,29 +123,22 @@ export default {
     async fetchServerUrl(serverHref) {
       try {
         const serverUrl = `https://wajik-anime-api.vercel.app${serverHref}`;
-        console.log("Fetching Server from:", serverUrl);
-
         const serverResponse = await axios.get(serverUrl);
-        console.log("Server Data Response:", serverResponse.data);
 
         if (!serverResponse.data.data || !serverResponse.data.data.url) {
           throw new Error("Server URL tidak ditemukan!");
         }
 
         this.selectedServerUrl = serverResponse.data.data.url;
-        console.log("Final Streaming URL:", this.selectedServerUrl);
       } catch (error) {
         console.error("Error fetching server URL:", error);
       }
     },
-    // Fungsi untuk berpindah ke episode sebelumnya
     goToPrevEpisode() {
       if (this.animeData.hasPrevEpisode) {
         this.$router.push({ path: this.animeData.prevEpisode.href });
       }
     },
-
-    // Fungsi untuk berpindah ke episode berikutnya
     goToNextEpisode() {
       if (this.animeData.hasNextEpisode) {
         this.$router.push({ path: this.animeData.nextEpisode.href });
@@ -171,24 +149,54 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  max-width: 900px;
-  margin: auto;
-  text-align: center;
-  background: white;
+/* Background & Container */
+.anime-player {
+  background: #121826;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
-  border-radius: 10px;
-  color: #000;
 }
-.video-wrapper {
+
+/* Tombol Kembali */
+.back {
+  width: 100%;
+  max-width: 800px;
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.back a {
+  color: #ffcc00;
+  text-decoration: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.back i {
+  margin-right: 8px;
+}
+
+/* Video Container */
+.video-container {
+  width: 90%;
+  max-width: 800px;
   position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
-  overflow: hidden;
-  max-width: 100%;
-  background: #000;
+  background: black;
   border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 10px 25px rgba(255, 255, 255, 0.1);
 }
+
+.video-container::after {
+  content: "";
+  display: block;
+  padding-bottom: 56.25%;
+}
+
 .video-player {
   position: absolute;
   top: 0;
@@ -196,53 +204,86 @@ export default {
   width: 100%;
   height: 100%;
 }
+
+/* Pilihan Server */
+.server-select {
+  margin-top: 15px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.server-select label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.server-select select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+}
+
+/* Judul Anime */
 .title {
   margin-top: 15px;
   font-size: 24px;
-  color: #0044cc;
+  font-weight: bold;
+  color: #ffcc00;
 }
+
+/* Navigasi Episode */
 .navigation {
   display: flex;
   justify-content: space-between;
+  width: 90%;
+  max-width: 800px;
   margin-top: 20px;
 }
+
 .nav-button {
-  background: #0044cc;
-  color: white;
-  padding: 10px 20px;
+  background: linear-gradient(135deg, #ffcc00, #ff9900);
+  color: black;
+  padding: 12px 20px;
+  font-weight: bold;
   text-decoration: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
 }
+
 .nav-button:hover {
-  background: #002a80;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
+
 .next {
   margin-left: auto;
 }
-.form-select {
-  width: 100%;
-  max-width: 400px;
-  margin: auto;
-}
+
+/* Alert */
 .alert {
+  margin-top: 15px;
   padding: 15px;
-  background: #ffcc00;
-  color: black;
+  background: rgba(255, 204, 0, 0.1);
+  color: #ffcc00;
   font-weight: bold;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 /* Responsiveness */
 @media (max-width: 768px) {
-  .container {
-    padding: 15px;
-  }
   .title {
     font-size: 20px;
   }
+
   .nav-button {
-    padding: 8px 15px;
+    padding: 10px 15px;
     font-size: 14px;
   }
 }
 </style>
+d
