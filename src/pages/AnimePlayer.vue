@@ -1,8 +1,9 @@
 <template>
+  <!-- <Header /> -->
   <div class="anime-player">
     <!-- Tombol Kembali -->
     <div class="back">
-      <a href="/samehadaku"> <i class="bi bi-arrow-left"></i> Kembali </a>
+      <a href="/"> <i class="bi bi-arrow-left"></i> Kembali </a>
     </div>
 
     <!-- Video Player -->
@@ -66,9 +67,13 @@
 
 <script>
 import axios from "axios";
+// import Header from "../components/Header.vue";
 
 export default {
   name: "AnimePlayer",
+  components: {
+    // Header,
+  },
   data() {
     return {
       animeData: {},
@@ -158,6 +163,7 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  /* width: 100%; */
 }
 
 /* Tombol Kembali */

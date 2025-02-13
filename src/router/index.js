@@ -5,6 +5,7 @@ import AnimeDetail from "../views/AnimeDetail.vue";
 import SearchResults from "../pages/SearchResults.vue";
 import AnimePlayer from "../pages/AnimePlayer.vue";
 // import AnimePlayer from "../pages/AnimePlayer.vue";
+import PageNotFound from "../pages/PageNotFound.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -34,6 +35,12 @@ const router = createRouter({
       path: "/samehadaku/search",
       name: "SearchResults",
       component: SearchResults,
+    },
+
+    //404
+    {
+      path: "/:pathMatch(.*)",
+      component: PageNotFound,
     },
   ],
 });

@@ -1,18 +1,23 @@
 <template>
-  <!-- <Header /> -->
-  <div class="banner" :style="{ backgroundImage: `url(${backgroundImage})` }">
-    <div class="slider" :style="`--quantity: ${limitedAnimes.length}`">
-      <a
-        v-for="(anime, index) in limitedAnimes"
-        :key="index"
-        class="item"
-        :style="`--position: ${index + 1}`"
-        :href="anime.href"
-      >
-        <img :src="anime.poster" :alt="anime.title" />
-      </a>
-      <div class="top-anime">
-        <h1>Top Anime</h1>
+  <div
+    class="container"
+    :style="{ backgroundImage: `url(${backgroundImage})` }"
+  >
+    <Header />
+    <div class="banner">
+      <div class="slider" :style="`--quantity: ${limitedAnimes.length}`">
+        <a
+          v-for="(anime, index) in limitedAnimes"
+          :key="index"
+          class="item"
+          :style="`--position: ${index + 1}`"
+          :href="anime.href"
+        >
+          <img :src="anime.poster" :alt="anime.title" />
+        </a>
+        <div class="top-anime">
+          <h1>Top Anime</h1>
+        </div>
       </div>
     </div>
   </div>
@@ -22,12 +27,12 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { fetchAnimeData } from "../api/api"; // Gunakan API.js
-// import Header from "../components/Header.vue";
+import Header from "../components/Header.vue";
 
 export default {
   name: "Home",
   components: {
-    // Header,
+    Header,
   },
   setup() {
     const animes = ref([]);
@@ -93,6 +98,31 @@ export default {
 body {
   background-color: #d2d2d2;
 }
+.container {
+  width: 100%;
+  height: 100vh;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 1s ease-in-out;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
+}
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  filter: blur(10px);
+  z-index: -1;
+  width: 100%;
+  height: 100vh;
+}
 .banner {
   width: 100%;
   height: 100vh;
@@ -104,17 +134,6 @@ body {
   transition: background-image 1s ease-in-out;
   margin: 0;
   padding: 0;
-}
-
-.banner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: inherit;
-  background-size: cover;
-  background-position: center;
-  filter: blur(5px);
-  z-index: 1;
 }
 
 .slider {
